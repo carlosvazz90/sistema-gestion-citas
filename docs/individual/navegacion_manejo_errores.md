@@ -1,0 +1,18 @@
+# Investigación Individual act 4
+## Jesús Emmanuel Cruz Orea
+### Navegación avanzada y manejo de errores
+
+# UX de manejo de errores
+El UX de manejo de errores es el área de la experiencia de usuario que se enfoca en diseñar la forma en que un sistema comunica, previene y responde a los errores que ocurren durante la interacción del usuario con una aplicación, sitio web o software. Su objetivo principal no es únicamente informar que algo salió mal, sino ayudar al usuario a comprender qué ocurrió, por qué sucedió y qué puede hacer para continuar sin frustración ni pérdida de control. Desde esta perspectiva, los errores son considerados eventos normales dentro del uso de un sistema y no fallos graves que deban castigar al usuario.
+
+Además, el UX de manejo de errores tiene como finalidad permitir que el usuario se recupere fácilmente de la situación, manteniendo su progreso y ofreciéndole alternativas claras para continuar. Un sistema bien diseñado guía al usuario para corregir el error o retomar su actividad, reduciendo el impacto negativo de la falla. De esta manera, el manejo adecuado de errores se convierte en un elemento clave para mejorar la usabilidad, fortalecer la confianza del usuario y garantizar una experiencia digital más humana y eficiente.
+
+# Errores 404 y 500
+El error 404, conocido como “Página no encontrada”, ocurre cuando el usuario intenta acceder a una dirección que no existe o que ya no está disponible en el servidor. Esto puede suceder por enlaces rotos, direcciones mal escritas o páginas que fueron eliminadas o movidas. En términos de UX, este error suele hacer que el usuario se sienta perdido, ya que esperaba encontrar contenido específico y no lo logra. Por ello, un buen manejo del error 404 busca orientar al usuario, explicarle de forma clara que la página no está disponible y ofrecerle alternativas para continuar navegando, como regresar al inicio o buscar otra sección, evitando así la frustración y el abandono del sitio.
+
+El error 500, denominado “Error interno del servidor”, se presenta cuando el servidor no puede procesar la solicitud del usuario debido a un problema interno. A diferencia del error 404, este fallo no depende de la acción del usuario, sino del sistema. Desde la perspectiva de UX, este tipo de error puede generar mayor incertidumbre, ya que el usuario no sabe si debe intentar de nuevo, esperar o salir del sitio. Por esta razón, es importante que el mensaje asociado al error 500 comunique de manera sencilla que el problema es temporal y ajeno al usuario, transmitiendo confianza y ofreciendo una posible acción, como recargar la página o intentarlo más tarde.
+
+# Mensajes accesibles (aria-live)
+Los mensajes accesibles (aria-live) son un mecanismo de accesibilidad web que permite informar automáticamente a los usuarios que utilizan lectores de pantalla cuando ocurre un cambio importante en el contenido de una página. El atributo aria-live se usa para indicar que cierta información debe ser anunciada sin que el usuario tenga que interactuar con la interfaz, asegurando que los mensajes dinámicos, como errores o confirmaciones, no pasen desapercibidos.
+
+Desde la experiencia de usuario, aria-live es fundamental para mantener a las personas informadas y en control durante su interacción con un sistema digital. Su uso mejora la accesibilidad y la inclusión, ya que garantiza que todos los usuarios reciban la información relevante en el momento adecuado, contribuyendo a una experiencia más clara, equitativa y usable.

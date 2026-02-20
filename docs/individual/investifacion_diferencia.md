@@ -1,4 +1,4 @@
-# Investigación Individual
+# Investigación Individual act 2
 ## Jesús Emmanuel Cruz Orea
 ### Fundamentos del proyecto
 
