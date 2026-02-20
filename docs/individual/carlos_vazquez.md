@@ -62,12 +62,22 @@ Esto permite que el sistema sea usable incluso sin depender exclusivamente del m
 
 ## 6. Análisis de Plataformas Similares
 
-Se analizaron plataformas como sistemas de agendamiento en línea que permiten configurar horarios y gestionar citas.
+ Análisis de Plataformas Similares
 
-A partir de ese análisis se tomó como referencia:
+Se analizaron plataformas reales como:
 
-- Flujo simple de reserva
-- Separación de roles
-- Interfaz clara y organizada
+Calendly
+Sistema de agendamiento en línea que permite configurar disponibilidad y generar enlaces para reservar citas.
+Se destaca por su flujo simple y facilidad de uso.
 
-Esto permitió definir una solución realista y alineada con estándares actuales.
+Booksy
+Plataforma orientada a negocios de servicios como barberías y estética.
+Permite gestión de empleados, clientes y horarios.
+
+A partir de este análisis se tomó como referencia:
+
+Flujo simple de reserva
+
+Separación de roles
+
+Interfaz clara y organizada

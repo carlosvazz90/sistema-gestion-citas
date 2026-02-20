@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Citas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; color: #333; }
+    
+    nav { background: #1976d2; padding: 15px; }
+    nav ul { list-style: none; display: flex; gap: 20px; }
+    nav a { color: white; text-decoration: none; padding: 8px 12px; }
+    nav a:hover, nav a:focus { background: #1565c0; outline: 2px solid white; }
+    
+    main { padding: 30px; max-width: 1200px; margin: 0 auto; }
+    h1 { color: #1976d2; margin-bottom: 20px; }
+    
+    .form-container { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    input:focus { outline: 2px solid #1976d2; }
+    
+    button { background: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; }
+    button:hover { background: #1565c0; transform: translateY(-1px); }
+    button:focus { outline: 2px solid #333; outline-offset: 2px; }
+    
+    /* Estados del botón */
+    button.loading { background: #757575; cursor: wait; opacity: 0.7; }
+    button.loading:hover { background: #757575; transform: none; }
+    button:disabled { background: #bdbdbd; cursor: not-allowed; opacity: 0.6; }
+    button.success { background: #388e3c; animation: pulse 0.3s ease; }
+    button.error { background: #d32f2f; animation: shake 0.5s ease; }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .btn-spinner { 
+      display: inline-block; 
+      margin-left: 5px; 
+      animation: spin 1s linear infinite;
+    }
+    
+    .cita-card { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; transition: all 0.2s ease; }
+    .cita-card h3 { color: #1976d2; margin-bottom: 10px; }
+    .cita-card:focus-within { outline: 2px solid #1976d2; box-shadow: 0 0 8px rgba(25, 118, 210, 0.3); }
+    .cita-card:focus { outline: 2px solid #1976d2; box-shadow: 0 0 8px rgba(25, 118, 210, 0.3); }
+    
+    .btn-eliminar { background: #d32f2f; margin-top: 10px; }
+    .btn-eliminar:hover { background: #b71c1c; }
+    
+    /* Campos con error */
+    input.error { border-color: #d32f2f; background: #ffebee; }
+    input.error:focus { outline-color: #d32f2f; }
+    .error-message { color: #d32f2f; font-size: 0.875rem; margin-top: 4px; display: block; }
+    
+    /* Estados del anuncio ARIA */
+    #aria-live-region { 
+      padding: 10px; 
+      margin: 10px 0; 
+      border-radius: 4px; 
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    #aria-live-region.status-info { background: #e3f2fd; color: #1976d2; border: 1px solid #1976d2; }
+    #aria-live-region.status-success { background: #e8f5e9; color: #388e3c; border: 1px solid #388e3c; }
+    #aria-live-region.status-error { background: #ffebee; color: #d32f2f; border: 1px solid #d32f2f; }
+    
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+  </style>
+</head>
+<body>
+  <nav role="navigation" aria-label="Menú principal">
+    <ul>
+      <li><a href="/" tabindex="0">Inicio</a></li>
+      <li><a href="/citas" tabindex="0">Citas</a></li>
+      <li><a href="/clientes" tabindex="0">Clientes</a></li>
+    </ul>
+  </nav>
+
+  <main role="main">
+    <h1>Gestión de Citas</h1>
+
+    <!-- Región ARIA live para anuncios -->
+    <div id="aria-live-region" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+    <div class="form-container">
+      <h2>Agendar Nueva Cita</h2>
+      <form id="form-cita">
+        <div class="form-group">
+          <label for="cliente">Nombre del Cliente:</label>
+          <input type="text" id="cliente" name="cliente" required aria-required="true">
+        </div>
+        <div class="form-group">
+          <label for="fecha">Fecha:</label>
+          <input type="date" id="fecha" name="fecha" required aria-required="true">
+        </div>
+        <div class="form-group">
+          <label for="hora">Hora:</label>
+          <input type="time" id="hora" name="hora" required aria-required="true">
+        </div>
+        <button type="submit" id="btn-agregar-cita">Agregar Cita</button>
+      </form>
+    </div>
+
+    <section aria-label="Lista de citas">
+      <h2>Citas Agendadas</h2>
+      <div id="lista-citas" role="region" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="/js/components.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
