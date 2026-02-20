@@ -9,7 +9,7 @@ La diferencia entre una página web y una aplicación web radica principalmente 
 
 Una aplicación web funciona como un software completo que se ejecuta dentro del navegador. Su finalidad no es solo mostrar información, sino permitir que el usuario interactúe activamente con el sistema, introduzca datos, realice procesos y obtenga resultados en tiempo real. Las aplicaciones web suelen manejar usuarios, contraseñas, roles, bases de datos y reglas de negocio, lo que las convierte en herramientas dinámicas y funcionales. Ejemplos claros de aplicaciones web profesionales son Google Drive, que permite crear y editar documentos en línea; Amazon, que gestiona compras, pagos y envíos; o Trello, que ayuda a organizar proyectos y tareas de manera colaborativa.
 
-# Ejemplos reales de aplicaciones web profesionales de gestión de citas
+## Ejemplos reales de aplicaciones web profesionales de gestión de citas
 
 ## Calendly
 Funcionan como aplicaciones web porque permiten agendar reuniones y reservar horarios disponibles directamente desde el navegador, sincronizando calendarios y evitando conflictos de tiempo.
@@ -20,11 +20,11 @@ Gestiona citas médicas, disponibilidad de profesionales de la salud y recordato
 ## Booksy
 Permite a negocios como barberías o salones administrar reservas, clientes y horarios de atención en línea.
 
-# Qué tipo de problemas se resuelven con software de gestión de citas
+## Qué tipo de problemas se resuelven con software de gestión de citas
 
 El software de gestión de citas está diseñado para facilitar y optimizar la organización de horarios y la atención de servicios, evitando procesos manuales que suelen ser lentos o propensos a errores. A través de este tipo de software es posible automatizar la programación de citas, controlar la disponibilidad de recursos o personal, enviar recordatorios automáticos a los clientes y mantener un registro ordenado de reservas y asistencias. Además, permite mejorar la comunicación entre el negocio y los usuarios, reducir ausencias y optimizar el uso del tiempo.
 
-# Arquitectura general de aplicaciones web
+## Arquitectura general de aplicaciones web
 
 ## Frontend
 Es la parte de la aplicación web con la que el usuario interactúa de manera directa. Incluye todo lo que se puede ver y manipular desde el navegador, como pantallas, botones, formularios, menús y mensajes visuales. Su principal función es ofrecer una experiencia clara, intuitiva y agradable, permitiendo que el usuario comprenda fácilmente cómo utilizar el sistema. El frontend se encarga de mostrar la información que recibe del backend y de enviar las acciones del usuario, como clics o formularios, para que sean procesadas. Para su desarrollo se utilizan tecnologías como HTML, CSS y JavaScript, las cuales permiten construir interfaces dinámicas y adaptables a distintos dispositivos.
@@ -35,7 +35,7 @@ Corresponde a la parte interna de la aplicación web, aquella que no es visible 
 ## Infraestructura y los entornos
 hacen referencia al conjunto de recursos tecnológicos que permiten que la aplicación web esté disponible y funcione correctamente en internet. Esto incluye los servidores donde se aloja el sistema, los servicios en la nube que proporcionan almacenamiento y capacidad de procesamiento, así como la configuración de diferentes entornos como desarrollo, pruebas y producción. Estos entornos permiten crear, probar y desplegar la aplicación de forma controlada, garantizando estabilidad, rendimiento y seguridad. Una infraestructura bien definida es clave para que la aplicación pueda escalar y mantenerse operativa ante un mayor número de usuarios.
 
-# Arquitectura de información y accesibilidad
+## Arquitectura de información y accesibilidad
 
 ## Jerarquías de contenido
 Consisten en ordenar la información según su importancia dentro de la interfaz. Los elementos principales se destacan mediante títulos, tamaños de letra, colores y espacios, mientras que la información secundaria se presenta de forma más discreta. Una jerarquía clara permite identificar rápidamente lo más relevante.
