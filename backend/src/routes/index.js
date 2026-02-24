@@ -305,21 +305,8 @@ router.get('/dashboard', (req, res) => {
 });
 
 router.get('/citas', (req, res) => {
-  const acceptsHtml = req.accepts('html');
-  
-  if (acceptsHtml) {
-    const html = generarPaginaHTML(
-      'Gestión de Citas',
-      '<a href="/">Inicio</a> <span>/</span> <a href="/dashboard">Dashboard</a> <span>/</span> <span>Citas</span>',
-      `
-        <h1>Gestión de Citas</h1>
-        <p>Administra todas las citas del sistema.</p>
-      `
-    );
-    return res.send(html);
-  }
-  
-  res.json({ mensaje: 'Gestión de citas - requiere autenticación' });
+  const path = require('path');
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'citas.html'));
 });
 
 router.get('/clientes', (req, res) => {
