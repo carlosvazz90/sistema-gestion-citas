@@ -22,7 +22,7 @@
     input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
     input:focus { outline: 2px solid #1976d2; }
     
-    button { background: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; }
+    button { background: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease, transform 0.3s ease; }
     button:hover { background: #1565c0; transform: translateY(-1px); }
     button:focus { outline: 2px solid #333; outline-offset: 2px; }
     
@@ -55,7 +55,7 @@
       animation: spin 1s linear infinite;
     }
     
-    .cita-card { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; transition: all 0.2s ease; }
+    .cita-card { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; transition: box-shadow 0.2s ease, border-color 0.2s ease; }
     .cita-card h3 { color: #1976d2; margin-bottom: 10px; }
     .cita-card:focus-within { outline: 2px solid #1976d2; box-shadow: 0 0 8px rgba(25, 118, 210, 0.3); }
     .cita-card:focus { outline: 2px solid #1976d2; box-shadow: 0 0 8px rgba(25, 118, 210, 0.3); }
@@ -74,13 +74,27 @@
       margin: 10px 0; 
       border-radius: 4px; 
       font-weight: bold;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
     #aria-live-region.status-info { background: #e3f2fd; color: #1976d2; border: 1px solid #1976d2; }
     #aria-live-region.status-success { background: #e8f5e9; color: #388e3c; border: 1px solid #388e3c; }
     #aria-live-region.status-error { background: #ffebee; color: #d32f2f; border: 1px solid #d32f2f; }
     
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+    
+    /* Accesibilidad: Respetar preferencia de movimiento reducido */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      
+      .btn-spinner {
+        animation: none;
+        opacity: 0.7;
+      }
+    }
   </style>
 </head>
 <body>

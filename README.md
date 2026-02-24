@@ -10,6 +10,8 @@ Aplicación web accesible desarrollada con Node.js que permite a negocios locale
 - ✅ Manejo robusto de errores de red
 - ✅ Componentes dinámicos sin recargar página
 - ✅ Navegación por teclado completa
+- ✅ **Animaciones accesibles** (respeta `prefers-reduced-motion`)
+- ✅ **Optimización de performance** (transiciones específicas, sin `transition: all`)
 - ✅ Tests automatizados (51 tests, 81.97% cobertura)
 - ✅ CI/CD con GitHub Actions
 
