@@ -2,20 +2,20 @@
 
 Aplicación web accesible desarrollada con Node.js que permite a negocios locales administrar citas de manera organizada y digital.
 
-## 🚀 Características principales
+Características principales
 
-- ✅ API REST funcional (GET, POST, DELETE)
-- ✅ Comunicación asíncrona con fetch()
-- ✅ Estados de carga accesibles (ARIA)
-- ✅ Manejo robusto de errores de red
-- ✅ Componentes dinámicos sin recargar página
-- ✅ Navegación por teclado completa
-- ✅ **Animaciones accesibles** (respeta `prefers-reduced-motion`)
-- ✅ **Optimización de performance** (transiciones específicas, sin `transition: all`)
-- ✅ Tests automatizados (51 tests, 81.97% cobertura)
-- ✅ CI/CD con GitHub Actions
+- API REST funcional (GET, POST, DELETE)
+- Comunicación asíncrona con fetch()
+- Estados de carga accesibles (ARIA)
+- Manejo robusto de errores de red
+- Componentes dinámicos sin recargar página
+- Navegación por teclado completa
+- Animaciones accesibles (respeta `prefers-reduced-motion`)
+- Optimización de performance (transiciones específicas, sin `transition: all`)
+- Tests automatizados (51 tests, 81.97% cobertura)
+- CI/CD con GitHub Actions
 
-## 🛠 Tecnologías utilizadas
+Tecnologías utilizadas
 
 - **Backend**: Node.js 18+ + Express 4.18
 - **Testing**: Jest + Supertest + jsdom
@@ -23,7 +23,7 @@ Aplicación web accesible desarrollada con Node.js que permite a negocios locale
 - **Accesibilidad**: ARIA live regions, estados accesibles
 - **DevOps**: Docker + GitHub Actions
 
-## 📁 Estructura del proyecto
+Estructura del proyecto
 
 ```
 sistema-gestion-citas/
@@ -63,7 +63,7 @@ sistema-gestion-citas/
 └── README.md
 ```
 
-## 🏃 Ejecución en local
+Ejecución en local
 
 ### Clonar repositorio
 
@@ -89,7 +89,7 @@ El servidor correrá en http://localhost:3000
 - **Error 404**: http://localhost:3000/xyz
 - **Error 500**: http://localhost:3000/error-500
 
-## 🧪 Tests
+Tests
 
 ```bash
 cd backend
