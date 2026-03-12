@@ -1,65 +1,46 @@
-# Sistema de Gestión de Citas
+﻿# Sistema de Gestion de Citas
 
-Aplicación web desarrollada con Node.js que permite a negocios locales administrar citas de manera organizada y digital.
+Aplicacion web accesible con Node.js para negocios locales.
 
-## Tecnologías utilizadas
+## Caracteristicas principales
 
-- Node.js
-- Express
-- Docker
-- GitHub Actions (CI/CD)
+- Login seguro, accesible y controlado por teclado
+- API REST funcional (GET, POST, DELETE)
+- Comunicacion asincrona con fetch()
+- Estados de carga accesibles (ARIA)
+- Navegacion por teclado completa
+- Tests automatizados (66 tests)
+- CI/CD con GitHub Actions
 
-## Estructura del proyecto
+## Tecnologias
 
-El sistema está dividido en `backend` y preparado para integración futura con frontend.
+- Backend: Node.js 18+ + Express 4.18
+- Testing: Jest + Supertest + jsdom
+- Frontend: JavaScript vanilla
+- Accesibilidad: ARIA live regions
+- DevOps: Docker + GitHub Actions
 
-```
-sistema-gestion-citas/
-│
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── models/
-│   │   ├── middlewares/
-│   │   └── app.js
-│   ├── server.js
-│   ├── package.json
-│   └── Dockerfile
-│
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-│
-├── .gitignore
-└── README.md
-```
+## Ejecucion en local
 
-## Ejecución en local
+cd backend / npm install / npm run dev
 
-Clonar repositorio
+Corre en: http://localhost:3000
 
-Ejecutar:
+## Credenciales de prueba
 
-```bash
-cd backend
-npm install
-npm run dev
-```
+| Email | Password | Rol |
+|-------|----------|-----|
+| admin@ejemplo.com | admin123 | admin |
+| usuario@ejemplo.com | usuario123 | usuario |
 
-El servidor correrá en http://localhost:3000
+## Autenticacion
 
-## Ejecución con Docker
+- POST /api/auth/login
+- POST /api/auth/logout
+- GET /api/auth/verify
 
-```bash
-docker build -t sistema-citas .
-docker run -p 3000:3000 sistema-citas
-```
+## Tests
 
-## Estrategia de commits sugerida
+cd backend && npm test
 
-- "Estructura inicial del proyecto"
-- "Configuración de Express y servidor base"
-- "Configuración Docker"
-- "Implementación pipeline CI/CD"
-- "Documentación README inicial"
+66 tests pasando.
