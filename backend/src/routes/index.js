@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const authRoutes = require('./auth');
 
 // Almacenamiento en memoria para las citas
 let citas = [];
@@ -233,21 +234,8 @@ router.get('/', (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-  const acceptsHtml = req.accepts('html');
-  
-  if (acceptsHtml) {
-    const html = generarPaginaHTML(
-      'Login',
-      '<a href="/">Inicio</a> <span>/</span> <span>Login</span>',
-      `
-        <h1>Iniciar Sesión</h1>
-        <p>Ingresa tus credenciales para acceder al sistema.</p>
-      `
-    );
-    return res.send(html);
-  }
-  
-  res.json({ mensaje: 'Ruta de inicio de sesión' });
+  const path = require('path');
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.html'));
 });
 
 router.get('/registro', (req, res) => {
@@ -330,5 +318,8 @@ router.get('/clientes', (req, res) => {
 router.get('/error-500', (req, res) => {
   throw new Error('Error interno de prueba');
 });
+
+// Usar rutas de autenticación
+router.use(authRoutes);
 
 module.exports = router;

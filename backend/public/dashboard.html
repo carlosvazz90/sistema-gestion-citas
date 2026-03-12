@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Gestión de Citas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    nav {
+      background: #1976d2;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 12px;
+      margin: 0 5px;
+    }
+
+    nav a:hover, nav a:focus {
+      background: #1565c0;
+      outline: 2px solid white;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    main {
+      padding: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #1976d2;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border-left: 4px solid #1976d2;
+    }
+
+    .user-info p {
+      margin: 5px 0;
+    }
+
+    .alert {
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border-left: 4px solid;
+    }
+
+    .alert-error {
+      background-color: #ffebee;
+      border-color: #d32f2f;
+      color: #d32f2f;
+    }
+
+    button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover, button:focus {
+      background: #1565c0;
+      outline: 2px solid #333;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .user-role {
+      background: #f0f0f0;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <nav role="navigation" aria-label="Menú principal">
+    <div>
+      <a href="/" tabindex="0">Inicio</a>
+      <a href="/citas" tabindex="0">Citas</a>
+      <a href="/agendar" tabindex="0">Agendar</a>
+    </div>
+    <div class="nav-right">
+      <span id="userName" class="sr-only">Usuario: </span>
+      <span id="userRole" class="user-role">-</span>
+      <button id="logoutBtn" type="button" aria-label="Cerrar sesión">Logout</button>
+    </div>
+  </nav>
+
+  <main role="main">
+    <h1>Dashboard</h1>
+    <div id="authError" class="alert alert-error" style="display: none;" role="alert"></div>
+    
+    <div class="container">
+      <div class="user-info">
+        <h2>Información de Sesión</h2>
+        <p><strong>Usuario:</strong> <span id="userEmail">-</span></p>
+        <p><strong>ID:</strong> <span id="userId">-</span></p>
+        <p><strong>Rol:</strong> <span id="displayRole">-</span></p>
+      </div>
+
+      <p>Bienvenido al dashboard. Aquí puedes gestionar tus citas.</p>
+    </div>
+  </main>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
