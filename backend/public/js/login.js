@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+  const AUTH_STORAGE_KEY = 'authSession';
   const loginForm = document.getElementById('loginForm');
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -126,10 +127,17 @@ document.addEventListener('DOMContentLoaded', function() {
         statusMessage.textContent = 'Login exitoso. Redirigiendo...';
         statusMessage.setAttribute('role', 'status');
         
-        // Guardar sesión en localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userId', data.userId);
-        localStorage.setItem('role', data.role);
+        // Guardar sesión en una sola estructura para evitar estados inconsistentes
+        const authSession = {
+          token: data.token,
+          sessionId: data.sessionId,
+          userId: data.userId,
+          role: data.role,
+          expiresAt: data.expiresAt,
+          updatedAt: Date.now()
+        };
+
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authSession));
         
         setTimeout(() => {
           window.location.href = '/dashboard.html';
