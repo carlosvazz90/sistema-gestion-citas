@@ -40,6 +40,7 @@ Corre en: http://localhost:3000
 ## Rutas
 
 - http://localhost:3000/login
+- http://localhost:3000/recuperar
 - http://localhost:3000/dashboard.html
 - http://localhost:3000/citas.html
 
@@ -48,6 +49,9 @@ Corre en: http://localhost:3000
 - POST /api/auth/login
 - POST /api/auth/logout
 - GET /api/auth/verify
+- POST /api/auth/password/request
+- POST /api/auth/password/validate
+- POST /api/auth/password/reset
 
 ## Tests
 

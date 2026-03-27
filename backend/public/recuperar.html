@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Contraseña - Gestión de Citas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #00a8a8 0%, #005f73 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #1f2937;
+      padding: 20px;
+    }
+
+    .recovery-container {
+      width: 100%;
+      max-width: 560px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.15);
+      padding: 28px;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #005f73;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    p.subtitle {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #374151;
+    }
+
+    .section {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: #f8fafc;
+    }
+
+    .section h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #0f766e;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: 2px solid #0f766e;
+      outline-offset: 2px;
+      border-color: #0f766e;
+    }
+
+    input.error {
+      border-color: #b91c1c;
+      background: #fee2e2;
+    }
+
+    .error-message {
+      display: block;
+      min-height: 18px;
+      color: #b91c1c;
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    button {
+      width: 100%;
+      background: #0f766e;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 11px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0b5f59;
+    }
+
+    button:focus {
+      outline: 2px solid #005f73;
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .alert {
+      border-left: 4px solid;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+
+    .alert-success {
+      background: #ecfdf5;
+      border-color: #15803d;
+      color: #166534;
+    }
+
+    .alert-error {
+      background: #fef2f2;
+      border-color: #b91c1c;
+      color: #991b1b;
+    }
+
+    .token-box {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px dashed #0369a1;
+      border-radius: 6px;
+      background: #f0f9ff;
+      color: #0c4a6e;
+      word-break: break-all;
+      font-size: 14px;
+      display: none;
+    }
+
+    .links {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    a {
+      color: #0f766e;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:focus {
+      text-decoration: underline;
+      outline: 2px solid #0f766e;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 600px) {
+      .recovery-container {
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="recovery-container" aria-labelledby="tituloRecuperacion">
+    <h1 id="tituloRecuperacion">Recuperación de Contraseña</h1>
+    <p class="subtitle">Flujo seguro: solicitud, validación y cambio.</p>
+
+    <div id="statusMessage" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <section class="section" aria-labelledby="solicitudTitle">
+      <h2 id="solicitudTitle">1) Solicitud</h2>
+      <form id="requestForm" novalidate>
+        <div class="form-group">
+          <label for="requestEmail">Correo electrónico</label>
+          <input
+            type="email"
+            id="requestEmail"
+            name="requestEmail"
+            required
+            autocomplete="email"
+            aria-describedby="requestEmailError"
+            placeholder="correo@ejemplo.com"
+          >
+          <span id="requestEmailError" class="error-message" role="alert"></span>
+        </div>
+        <button type="submit" id="requestBtn">Solicitar recuperación</button>
+      </form>
+      <div id="tokenBox" class="token-box" aria-live="polite"></div>
+    </section>
+
+    <section class="section" aria-labelledby="validacionTitle">
+      <h2 id="validacionTitle">2) Validación</h2>
+      <form id="validateForm" novalidate>
+        <div class="form-group">
+          <label for="tokenValidate">Token de recuperación</label>
+          <input
+            type="text"
+            id="tokenValidate"
+            name="tokenValidate"
+            required
+            aria-describedby="tokenValidateError"
+            placeholder="Pega tu token"
+          >
+          <span id="tokenValidateError" class="error-message" role="alert"></span>
+        </div>
+        <button type="submit" id="validateBtn">Validar token</button>
+      </form>
+    </section>
+
+    <section class="section" aria-labelledby="cambioTitle">
+      <h2 id="cambioTitle">3) Cambio de contraseña</h2>
+      <form id="resetForm" novalidate>
+        <div class="form-group">
+          <label for="tokenReset">Token</label>
+          <input
+            type="text"
+            id="tokenReset"
+            name="tokenReset"
+            required
+            aria-describedby="tokenResetError"
+            placeholder="Token validado"
+          >
+          <span id="tokenResetError" class="error-message" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">Nueva contraseña</label>
+          <input
+            type="password"
+            id="newPassword"
+            name="newPassword"
+            required
+            minlength="6"
+            autocomplete="new-password"
+            aria-describedby="newPasswordError"
+            placeholder="Mínimo 6 caracteres"
+          >
+          <span id="newPasswordError" class="error-message" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar contraseña</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+            autocomplete="new-password"
+            aria-describedby="confirmPasswordError"
+            placeholder="Repite la contraseña"
+          >
+          <span id="confirmPasswordError" class="error-message" role="alert"></span>
+        </div>
+
+        <button type="submit" id="resetBtn">Cambiar contraseña</button>
+      </form>
+    </section>
+
+    <div class="links">
+      <a href="/login">Volver a login</a>
+    </div>
+  </main>
+
+  <script src="js/recover.js"></script>
+</body>
+</html>

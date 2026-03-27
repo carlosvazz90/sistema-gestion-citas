@@ -326,4 +326,90 @@ describe('Autenticación - API Auth', () => {
 
   });
 
+  describe('Recuperación de contraseña', () => {
+    test('Debe responder con mensaje no revelador para email existente', async () => {
+      const response = await request(app)
+        .post('/api/auth/password/request')
+        .send({ email: 'admin@ejemplo.com' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toBe('Si el correo existe, se enviaron instrucciones de recuperación');
+      expect(response.body.recoveryToken).toBeDefined();
+    });
+
+    test('Debe responder con mensaje no revelador para email inexistente', async () => {
+      const response = await request(app)
+        .post('/api/auth/password/request')
+        .send({ email: 'no-existe@ejemplo.com' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toBe('Si el correo existe, se enviaron instrucciones de recuperación');
+      expect(response.body.recoveryToken).toBeUndefined();
+    });
+
+    test('Debe validar un token de recuperación vigente', async () => {
+      const requestResponse = await request(app)
+        .post('/api/auth/password/request')
+        .send({ email: 'usuario@ejemplo.com' });
+
+      const token = requestResponse.body.recoveryToken;
+
+      const validateResponse = await request(app)
+        .post('/api/auth/password/validate')
+        .send({ token });
+
+      expect(validateResponse.status).toBe(200);
+      expect(validateResponse.body.success).toBe(true);
+      expect(validateResponse.body.message).toBe('Token válido para cambio de contraseña');
+    });
+
+    test('Debe cambiar contraseña con token válido y permitir login con nueva contraseña', async () => {
+      const requestResponse = await request(app)
+        .post('/api/auth/password/request')
+        .send({ email: 'usuario@ejemplo.com' });
+
+      const token = requestResponse.body.recoveryToken;
+      const nuevaPassword = 'usuario456';
+
+      const resetResponse = await request(app)
+        .post('/api/auth/password/reset')
+        .send({ token, password: nuevaPassword });
+
+      expect(resetResponse.status).toBe(200);
+      expect(resetResponse.body.success).toBe(true);
+      expect(resetResponse.body.message).toBe('Contraseña actualizada correctamente');
+
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'usuario@ejemplo.com', password: nuevaPassword });
+
+      expect(loginResponse.status).toBe(200);
+      expect(loginResponse.body.success).toBe(true);
+      expect(loginResponse.body.token).toBeDefined();
+    });
+
+    test('Debe rechazar reutilización del mismo token después del cambio', async () => {
+      const requestResponse = await request(app)
+        .post('/api/auth/password/request')
+        .send({ email: 'admin@ejemplo.com' });
+
+      const token = requestResponse.body.recoveryToken;
+
+      await request(app)
+        .post('/api/auth/password/reset')
+        .send({ token, password: 'admin456' })
+        .expect(200);
+
+      const secondReset = await request(app)
+        .post('/api/auth/password/reset')
+        .send({ token, password: 'admin789' });
+
+      expect(secondReset.status).toBe(400);
+      expect(secondReset.body.success).toBe(false);
+      expect(secondReset.body.error).toBe('Token inválido o expirado');
+    });
+  });
+
 });

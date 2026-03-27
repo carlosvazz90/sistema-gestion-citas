@@ -238,6 +238,11 @@ router.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.html'));
 });
 
+router.get('/recuperar', (req, res) => {
+  const path = require('path');
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'recuperar.html'));
+});
+
 router.get('/registro', (req, res) => {
   const acceptsHtml = req.accepts('html');
   

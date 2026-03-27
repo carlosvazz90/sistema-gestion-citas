@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 
 // Almacenamiento en memoria para sesiones (en producción usar BD)
@@ -6,6 +7,10 @@ const sesiones = {};
 let contadorSesion = 1;
 
 const DURACION_SESION_MS = 3600 * 1000; // 1 hora
+const DURACION_TOKEN_RECUPERACION_MS = 15 * 60 * 1000; // 15 minutos
+
+// Tokens de recuperación en memoria (en producción usar BD)
+const tokensRecuperacion = {};
 
 function limpiarSesionesExpiradas() {
   const ahora = Date.now();
@@ -43,6 +48,65 @@ function eliminarSesionesUsuario(usuarioId) {
   });
 
   return eliminadas;
+}
+
+function limpiarTokensRecuperacionExpirados() {
+  const ahora = Date.now();
+  Object.keys(tokensRecuperacion).forEach((tokenHash) => {
+    const tokenInfo = tokensRecuperacion[tokenHash];
+    if (tokenInfo.usado || ahora > tokenInfo.expira) {
+      delete tokensRecuperacion[tokenHash];
+    }
+  });
+}
+
+function generarTokenSeguro() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function generarHashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+function crearTokenRecuperacion(usuarioId) {
+  // Invalidar tokens anteriores del usuario para reducir superficie de ataque
+  Object.keys(tokensRecuperacion).forEach((tokenHash) => {
+    if (tokensRecuperacion[tokenHash].usuarioId === usuarioId) {
+      delete tokensRecuperacion[tokenHash];
+    }
+  });
+
+  const token = generarTokenSeguro();
+  const tokenHash = generarHashToken(token);
+  const ahora = Date.now();
+
+  tokensRecuperacion[tokenHash] = {
+    usuarioId,
+    creadoEn: ahora,
+    expira: ahora + DURACION_TOKEN_RECUPERACION_MS,
+    usado: false
+  };
+
+  return token;
+}
+
+function obtenerTokenRecuperacionValido(tokenPlano) {
+  if (!tokenPlano) {
+    return null;
+  }
+
+  limpiarTokensRecuperacionExpirados();
+  const tokenHash = generarHashToken(tokenPlano);
+  const tokenInfo = tokensRecuperacion[tokenHash];
+
+  if (!tokenInfo || tokenInfo.usado || Date.now() > tokenInfo.expira) {
+    return null;
+  }
+
+  return {
+    tokenHash,
+    ...tokenInfo
+  };
 }
 
 // Base de datos simulada de usuarios
@@ -235,6 +299,134 @@ router.post('/api/auth/recover', (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Error al recuperar sesión'
+    });
+  }
+});
+
+// POST /api/auth/password/request
+router.post('/api/auth/password/request', (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email requerido'
+      });
+    }
+
+    // Respuesta no reveladora: siempre el mismo mensaje
+    const mensajeGenerico = 'Si el correo existe, se enviaron instrucciones de recuperación';
+    const usuario = usuarios.find((u) => u.email === email);
+
+    if (usuario) {
+      const tokenRecuperacion = crearTokenRecuperacion(usuario.id);
+      const respuesta = {
+        success: true,
+        message: mensajeGenerico
+      };
+
+      // Solo para evidencia funcional en entorno académico/desarrollo
+      if (process.env.NODE_ENV !== 'production') {
+        respuesta.recoveryToken = tokenRecuperacion;
+        respuesta.expiresInMinutes = 15;
+      }
+
+      return res.json(respuesta);
+    }
+
+    return res.json({
+      success: true,
+      message: mensajeGenerico
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Error al solicitar recuperación'
+    });
+  }
+});
+
+// POST /api/auth/password/validate
+router.post('/api/auth/password/validate', (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token requerido'
+      });
+    }
+
+    const tokenInfo = obtenerTokenRecuperacionValido(token);
+    if (!tokenInfo) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token inválido o expirado'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Token válido para cambio de contraseña'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Error al validar token'
+    });
+  }
+});
+
+// POST /api/auth/password/reset
+router.post('/api/auth/password/reset', (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token y contraseña requeridos'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: 'La contraseña debe tener al menos 6 caracteres'
+      });
+    }
+
+    const tokenInfo = obtenerTokenRecuperacionValido(token);
+    if (!tokenInfo) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token inválido o expirado'
+      });
+    }
+
+    const usuario = usuarios.find((u) => u.id === tokenInfo.usuarioId);
+    if (!usuario) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token inválido o expirado'
+      });
+    }
+
+    usuario.password = password;
+    tokensRecuperacion[tokenInfo.tokenHash].usado = true;
+    delete tokensRecuperacion[tokenInfo.tokenHash];
+    eliminarSesionesUsuario(usuario.id);
+
+    return res.json({
+      success: true,
+      message: 'Contraseña actualizada correctamente'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Error al cambiar contraseña'
     });
   }
 });
