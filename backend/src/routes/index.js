@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 const authRoutes = require('./auth');
 
@@ -15,7 +16,7 @@ let contadorId = 1;
  * Obtiene todas las citas
  * Manejo de errores: Captura errores internos
  */
-router.get('/api/citas', (req, res) => {
+router.get('/api/citas', authRoutes.verificarAutenticacion, (req, res) => {
   try {
     // Simular latencia de red (100-300ms)
     const latencia = Math.floor(Math.random() * 200) + 100;
@@ -41,7 +42,7 @@ router.get('/api/citas', (req, res) => {
  * Crea una nueva cita
  * Manejo de errores: Validación de datos, errores internos
  */
-router.post('/api/citas', (req, res) => {
+router.post('/api/citas', authRoutes.verificarAutenticacion, (req, res) => {
   try {
     const { cliente, fecha, hora } = req.body;
     
@@ -106,7 +107,11 @@ router.post('/api/citas', (req, res) => {
  * Elimina una cita por ID
  * Manejo de errores: Cita no encontrada, ID inválido, errores internos
  */
-router.delete('/api/citas/:id', (req, res) => {
+router.delete(
+  '/api/citas/:id',
+  authRoutes.verificarAutenticacion,
+  authRoutes.verificarRol(['admin']),
+  (req, res) => {
   try {
     const id = parseInt(req.params.id);
     
@@ -234,12 +239,10 @@ router.get('/', (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-  const path = require('path');
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.html'));
 });
 
 router.get('/recuperar', (req, res) => {
-  const path = require('path');
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'recuperar.html'));
 });
 
@@ -279,30 +282,19 @@ router.get('/agendar', (req, res) => {
   res.json({ mensaje: 'Ruta para agendar citas' });
 });
 
-router.get('/dashboard', (req, res) => {
-  const acceptsHtml = req.accepts('html');
-  
-  if (acceptsHtml) {
-    const html = generarPaginaHTML(
-      'Dashboard',
-      '<a href="/">Inicio</a> <span>/</span> <span>Dashboard</span>',
-      `
-        <h1>Dashboard</h1>
-        <p>Panel de control del sistema.</p>
-      `
-    );
-    return res.send(html);
+router.get(
+  '/dashboard',
+  authRoutes.protegerVista(['admin', 'usuario']),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'dashboard.html'));
   }
-  
-  res.json({ mensaje: 'Dashboard - requiere autenticación' });
-});
+);
 
-router.get('/citas', (req, res) => {
-  const path = require('path');
+router.get('/citas', authRoutes.protegerVista(['admin', 'usuario']), (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'citas.html'));
 });
 
-router.get('/clientes', (req, res) => {
+router.get('/clientes', authRoutes.protegerVista(['admin']), (req, res) => {
   const acceptsHtml = req.accepts('html');
   
   if (acceptsHtml) {

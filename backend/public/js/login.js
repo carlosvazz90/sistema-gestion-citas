@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authSession));
         
         setTimeout(() => {
-          window.location.href = '/dashboard.html';
+          window.location.href = '/dashboard';
         }, 1000);
       } else {
         // Error sin filtrar información sensible

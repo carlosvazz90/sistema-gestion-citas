@@ -2,6 +2,13 @@ const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
 
+const COOKIE_NAME = 'sessionToken';
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: 'strict',
+  path: '/'
+};
+
 // Almacenamiento en memoria para sesiones (en producción usar BD)
 const sesiones = {};
 let contadorSesion = 1;
@@ -109,6 +116,92 @@ function obtenerTokenRecuperacionValido(tokenPlano) {
   };
 }
 
+function obtenerCookies(req) {
+  const cookieHeader = req.headers.cookie;
+
+  if (!cookieHeader) {
+    return {};
+  }
+
+  return cookieHeader.split(';').reduce((cookies, pair) => {
+    const [rawName, ...rawValue] = pair.trim().split('=');
+    cookies[rawName] = decodeURIComponent(rawValue.join('='));
+    return cookies;
+  }, {});
+}
+
+function obtenerTokenRequest(req) {
+  const headerToken = req.headers.authorization?.replace('Bearer ', '').trim();
+
+  if (headerToken) {
+    return headerToken;
+  }
+
+  const cookies = obtenerCookies(req);
+  return cookies[COOKIE_NAME] || null;
+}
+
+function guardarCookieSesion(res, token, expira) {
+  res.cookie(COOKIE_NAME, token, {
+    ...COOKIE_OPTIONS,
+    expires: new Date(expira)
+  });
+}
+
+function limpiarCookieSesion(res) {
+  res.clearCookie(COOKIE_NAME, COOKIE_OPTIONS);
+}
+
+function responderBloqueoWeb(res, statusCode, mensaje) {
+  const titulo = statusCode === 401 ? 'Acceso restringido' : 'Acceso denegado';
+  const accion = statusCode === 401
+    ? '<a href="/login">Iniciar sesión</a>'
+    : '<a href="/dashboard">Volver al dashboard</a>';
+
+  return res.status(statusCode).send(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${titulo}</title>
+      <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; margin: 0; }
+        main { max-width: 640px; margin: 60px auto; background: #fff; padding: 32px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }
+        h1 { color: #d32f2f; margin-bottom: 12px; }
+        p { line-height: 1.5; }
+        a { display: inline-block; margin-top: 16px; color: #fff; background: #1976d2; padding: 10px 18px; border-radius: 4px; text-decoration: none; }
+      </style>
+    </head>
+    <body>
+      <main role="main">
+        <h1>${titulo}</h1>
+        <p>${mensaje}</p>
+        ${accion}
+      </main>
+    </body>
+    </html>
+  `);
+}
+
+function autenticarRequest(req) {
+  const token = obtenerTokenRequest(req);
+  const sesion = obtenerSesionValida(token);
+
+  if (!sesion) {
+    if (token) {
+      delete sesiones[token];
+    }
+
+    return null;
+  }
+
+  req.usuario = sesion.usuario;
+  req.token = token;
+  req.sesion = sesion;
+  return sesion;
+}
+
 // Base de datos simulada de usuarios
 const usuarios = [
   {
@@ -129,8 +222,8 @@ const usuarios = [
 
 // Middleware de autenticación
 const verificarAutenticacion = (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
+  const token = obtenerTokenRequest(req);
+
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -138,17 +231,15 @@ const verificarAutenticacion = (req, res, next) => {
     });
   }
 
-  const sesion = obtenerSesionValida(token);
+  const sesion = autenticarRequest(req);
+
   if (!sesion) {
-    delete sesiones[token];
     return res.status(401).json({
       success: false,
       error: 'Sesión expirada'
     });
   }
 
-  req.usuario = sesion.usuario;
-  req.token = token;
   next();
 };
 
@@ -161,6 +252,22 @@ const verificarRol = (rolesPermitidos) => {
         error: 'No tienes permisos'
       });
     }
+    next();
+  };
+};
+
+const protegerVista = (rolesPermitidos = []) => {
+  return (req, res, next) => {
+    const sesion = autenticarRequest(req);
+
+    if (!sesion) {
+      return responderBloqueoWeb(res, 401, 'Debes iniciar sesión para acceder a este recurso.');
+    }
+
+    if (rolesPermitidos.length > 0 && !rolesPermitidos.includes(req.usuario.role)) {
+      return responderBloqueoWeb(res, 403, 'Tu rol no tiene permisos para acceder a este recurso.');
+    }
+
     next();
   };
 };
@@ -208,6 +315,8 @@ router.post('/api/auth/login', (req, res) => {
       ultimaActividad: ahora
     };
 
+    guardarCookieSesion(res, token, expira);
+
     res.json({
       success: true,
       token: token,
@@ -233,6 +342,7 @@ router.post('/api/auth/logout', verificarAutenticacion, (req, res) => {
 
     if (cerrarTodas) {
       const total = eliminarSesionesUsuario(req.usuario.id);
+      limpiarCookieSesion(res);
       return res.json({
         success: true,
         message: 'Todas las sesiones cerradas',
@@ -241,6 +351,7 @@ router.post('/api/auth/logout', verificarAutenticacion, (req, res) => {
     }
 
     delete sesiones[req.token];
+    limpiarCookieSesion(res);
     res.json({
       success: true,
       message: 'Sesión cerrada'
@@ -287,6 +398,8 @@ router.post('/api/auth/recover', (req, res) => {
         error: 'Sesión inválida o expirada'
       });
     }
+
+    guardarCookieSesion(res, token, sesion.expira);
 
     return res.json({
       success: true,
@@ -418,6 +531,7 @@ router.post('/api/auth/password/reset', (req, res) => {
     tokensRecuperacion[tokenInfo.tokenHash].usado = true;
     delete tokensRecuperacion[tokenInfo.tokenHash];
     eliminarSesionesUsuario(usuario.id);
+    limpiarCookieSesion(res);
 
     return res.json({
       success: true,
@@ -450,5 +564,6 @@ router.get('/api/citas/protegido', verificarAutenticacion, (req, res) => {
 // Exportar middlewares
 router.verificarAutenticacion = verificarAutenticacion;
 router.verificarRol = verificarRol;
+router.protegerVista = protegerVista;
 
 module.exports = router;

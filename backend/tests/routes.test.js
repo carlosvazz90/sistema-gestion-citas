@@ -1,6 +1,14 @@
 const request = require('supertest');
 const app = require('../src/app');
 
+async function loginComo(email, password) {
+  const response = await request(app)
+    .post('/api/auth/login')
+    .send({ email, password });
+
+  return response.headers['set-cookie'][0].split(';')[0];
+}
+
 describe('Pruebas de rutas básicas', () => {
   test('GET / debe retornar información de la API en JSON', async () => {
     const res = await request(app)
@@ -57,15 +65,21 @@ describe('Pruebas de navegación accesible', () => {
   });
 
   test('Breadcrumbs deben ser navegables por teclado', async () => {
+    const cookie = await loginComo('usuario@ejemplo.com', 'usuario123');
+
     const res = await request(app)
       .get('/citas')
+      .set('Cookie', cookie)
       .set('Accept', 'text/html');
     expect(res.text).toContain('tabindex="0"');
   });
 
   test('Enlaces del menú deben tener tabindex', async () => {
+    const cookie = await loginComo('admin@ejemplo.com', 'admin123');
+
     const res = await request(app)
       .get('/dashboard')
+      .set('Cookie', cookie)
       .set('Accept', 'text/html');
     expect(res.text).toContain('tabindex="0"');
   });
@@ -105,25 +119,50 @@ describe('Pruebas de manejo de errores', () => {
 });
 
 describe('Pruebas de rutas privadas', () => {
-  test('GET /dashboard debe retornar HTML', async () => {
+  test('GET /dashboard debe bloquear acceso sin sesión', async () => {
     const res = await request(app)
       .get('/dashboard')
       .set('Accept', 'text/html');
-    expect(res.statusCode).toBe(200);
-    expect(res.text).toContain('Dashboard');
+    expect(res.statusCode).toBe(401);
+    expect(res.text).toContain('Debes iniciar sesión');
   });
 
-  test('GET /citas debe retornar HTML', async () => {
+  test('GET /dashboard.html debe bloquear acceso directo al recurso estático', async () => {
+    const res = await request(app)
+      .get('/dashboard.html')
+      .set('Accept', 'text/html');
+    expect(res.statusCode).toBe(401);
+    expect(res.text).toContain('Debes iniciar sesión');
+  });
+
+  test('GET /citas debe retornar HTML para usuario autenticado', async () => {
+    const cookie = await loginComo('usuario@ejemplo.com', 'usuario123');
+
     const res = await request(app)
       .get('/citas')
+      .set('Cookie', cookie)
       .set('Accept', 'text/html');
     expect(res.statusCode).toBe(200);
     expect(res.text).toContain('Gestión de Citas');
   });
 
-  test('GET /clientes debe retornar HTML', async () => {
+  test('GET /clientes debe bloquear a usuario sin rol admin', async () => {
+    const cookie = await loginComo('usuario@ejemplo.com', 'usuario123');
+
     const res = await request(app)
       .get('/clientes')
+      .set('Cookie', cookie)
+      .set('Accept', 'text/html');
+    expect(res.statusCode).toBe(403);
+    expect(res.text).toContain('Tu rol no tiene permisos');
+  });
+
+  test('GET /clientes debe retornar HTML para admin', async () => {
+    const cookie = await loginComo('admin@ejemplo.com', 'admin123');
+
+    const res = await request(app)
+      .get('/clientes')
+      .set('Cookie', cookie)
       .set('Accept', 'text/html');
     expect(res.statusCode).toBe(200);
     expect(res.text).toContain('Gestión de Clientes');
